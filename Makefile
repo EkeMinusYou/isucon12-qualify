@@ -16,7 +16,7 @@ endif
 	rsync -az -e ssh Brewfile $(SSH_USER)@$(SETUP_HOST):/home/$(ISUCON_USER)/ --rsync-path="sudo rsync"
 	ssh $(SSH_USER)@$(SETUP_HOST) "sudo chmod +x /home/$(ISUCON_USER)/setup.sh"
 
-.PHOYY: setup
+.PHONY: setup
 setup: setup-sysctl setup-nginx setup-webapp setup-mysql
 
 .PHONY: setup-sysctl
