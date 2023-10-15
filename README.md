@@ -1,4 +1,6 @@
-## Setup
+# 最初にやること
+
+# Shell環境を各サーバーにセットアップ
 
 サーバーでShellとNeovim環境をセットアップ。全てのサーバーで実行する
 
@@ -21,9 +23,10 @@ APP_NAME:=isuports
 make setup-nginx
 make setup-mysql
 make setup-webapp
+make setup-sysctl
 ```
 
-## SSH
+## SSHの設定
 
 `~/.ssh/config` のサンプル
 
@@ -77,71 +80,6 @@ webapp/go配下のビルドするMakefileのサンプル
 ```Makefile
 isuports:
 	go build -o isuports ./...
-```
-
-## Nginxの向き先を変える
-
-`nginx/sites-available/${サービス名}` の以下を書き変える。proxy_passで `127.0.0.1` となっている箇所を、対象のプライベートIPに変更する。
-
-
-```conf
-  location / {
-    try_files $uri /index.html;
-  }
-
-  location ~ ^/(api|initialize) {
-    proxy_set_header Host $host;
-    proxy_read_timeout 600;
-    proxy_pass http://127.0.0.1:3000;
-  }
-
-  location /auth/ {
-    proxy_set_header Host $host;
-    proxy_pass http://127.0.0.1:3001;
-  }
-```
-
-## 別サーバーのDBにアクセスする
-
-対象のサーバーの`mysql/mysql.conf.d/mysqld.confのbind-address`を無効にする
-
-```
-# bind-address		= 127.0.0.1
-```
-
-アプリのsystemdの設定で環境変数を対象のサーバーのIPアドレスに置換える
-
-```
-Environment=ISUCON_DB_HOST=172.31.32.96
-Environment=ISUCON_DB_PORT=3306
-Environment=ISUCON_DB_USER=isucon
-Environment=ISUCON_DB_PASSWORD=isucon
-Environment=ISUCON_DB_NAME=isucon
-```
-
-MySQLのisuconユーザーがlocalhost以外からの接続を受け入れているか確認する。%になっていたらOK
-
-```sql
-mysql -u isucon -p
-mysql> SELECT user, host FROM mysql.user;
-+------------------+-----------+
-| user             | host      |
-+------------------+-----------+
-| isucon           | %         |
-| debian-sys-maint | localhost |
-| mysql.infoschema | localhost |
-| mysql.session    | localhost |
-| mysql.sys        | localhost |
-| root             | localhost |
-+------------------+-----------+
-6 rows in set (0.00 sec)
-```
-
-なっていなかったら、以下のコマンドでユーザーと権限を追加する
-
-```sql
-CREATE USER "isucon"@"%" IDENTIFIED BY "isucon";
-GRANT ALL PRIVILEGES ON *.* TO "isucon"@"%";
 ```
 
 ## ログと計測の準備
@@ -231,6 +169,74 @@ pdf出力のためgarphvizをinstall
 brew install graphviz
 ```
 
+# 必要に応じてやること
+
+## Nginxの向き先を変える
+
+`nginx/sites-available/${サービス名}` の以下を書き変える。proxy_passで `127.0.0.1` となっている箇所を、対象のプライベートIPに変更する。
+
+
+```conf
+  location / {
+    try_files $uri /index.html;
+  }
+
+  location ~ ^/(api|initialize) {
+    proxy_set_header Host $host;
+    proxy_read_timeout 600;
+    proxy_pass http://127.0.0.1:3000;
+  }
+
+  location /auth/ {
+    proxy_set_header Host $host;
+    proxy_pass http://127.0.0.1:3001;
+  }
+```
+
+## 別サーバーのDBにアクセスする
+
+対象のサーバーの`mysql/mysql.conf.d/mysqld.confのbind-address`を無効にする
+
+```
+# bind-address		= 127.0.0.1
+```
+
+アプリのsystemdの設定で環境変数を対象のサーバーのIPアドレスに置換える
+
+```
+Environment=ISUCON_DB_HOST=172.31.32.96
+Environment=ISUCON_DB_PORT=3306
+Environment=ISUCON_DB_USER=isucon
+Environment=ISUCON_DB_PASSWORD=isucon
+Environment=ISUCON_DB_NAME=isucon
+```
+
+MySQLのisuconユーザーがlocalhost以外からの接続を受け入れているか確認する。%になっていたらOK
+
+```sql
+mysql -u isucon -p
+mysql> SELECT user, host FROM mysql.user;
++------------------+-----------+
+| user             | host      |
++------------------+-----------+
+| isucon           | %         |
+| debian-sys-maint | localhost |
+| mysql.infoschema | localhost |
+| mysql.session    | localhost |
+| mysql.sys        | localhost |
+| root             | localhost |
++------------------+-----------+
+6 rows in set (0.00 sec)
+```
+
+なっていなかったら、以下のコマンドでユーザーと権限を追加する
+
+```sql
+CREATE USER "isucon"@"%" IDENTIFIED BY "isucon";
+GRANT ALL PRIVILEGES ON *.* TO "isucon"@"%";
+```
+
+
 ## pgoを有効にする
 
 以下のようにmake targetを書き換える
@@ -257,6 +263,8 @@ tbls doc mysql://isucon:isucon@localhost:3306/isuports ./dbdoc
 mkdir -p dbdoc
 rsync -az -e ssh ubuntu@isucon-1:/home/isucon/dbdoc/ dbdoc/ --rsync-path="sudo rsync"
 ```
+
+# 秘伝のタレ
 
 ## nginx.conf
 
