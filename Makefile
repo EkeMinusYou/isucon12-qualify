@@ -91,7 +91,7 @@ before-bench:
 	ssh $(SSH_USER)@$(MYSQL_HOST) "sudo mv /var/log/mysql/mysql-slow.log /var/log/mysql/mysql-slow.log.`date +%Y%m%d-%H%M%S`"
 	ssh $(SSH_USER)@$(MYSQL_HOST) "sudo systemctl restart mysql"
 	[ -e "profile/cpu.pprof" ] && mv profile/cpu.pprof profile/cpu_`date +%Y%m%d-%H%M%S`.pprof || true
-	[ -e "profile/cpu.pdf" ] && mv profile/cpu.pdf profile/cpu_`date +%Y%m%d-%H%M%S`.pdf
+	[ -e "profile/cpu.pdf" ] && mv profile/cpu.pdf profile/cpu_`date +%Y%m%d-%H%M%S`.pdf || true
 
 .PHONY: after-bench
 after-bench:
