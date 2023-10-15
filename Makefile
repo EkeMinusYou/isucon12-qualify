@@ -3,11 +3,11 @@ ISUCON_USER:=isucon
 APP_NAME:=isuports
 
 NGINX_HOST:=isucon-1
-WEBAPP_HOST:=isucon-2
-MYSQL_HOST:=isucon-3
+WEBAPP_HOST:=isucon-1
+MYSQL_HOST:=isucon-1
 
-.PHONY: setup
-setup:
+.PHONY: setup-shell
+setup-shell:
 ifndef SETUP_HOST
 	@echo "ERROR: SETUP_HOST is not defined\n"
 	@exit 1
