@@ -84,9 +84,9 @@ isuports:
 
 ## ログと計測の準備
 
-最終的に元に戻すこと
+**最終的に元に戻すこと**
 
-### Nginx
+### Nginxでalp用のログ出力
 
 `nginx/nginx.conf` でログ出力を以下のように書き換える
 
@@ -110,6 +110,16 @@ isuports:
 
 ```
 access_log /var/log/nginx/access.log json;
+```
+
+## MySQLのスロークエリ
+
+`mysql/mysql.conf.d/mysqld.cnf` で以下のように書く。
+
+```
+slow_query_log		= 1
+slow_query_log_file	= /var/log/mysql/mysql-slow.log
+long_query_time = 0
 ```
 
 ### Goのprofile
@@ -335,14 +345,6 @@ http {
 ```
 
 ## mysqld.cnf
-
-スロークエリを有効にする。最後に無効にすること。
-
-```
-slow_query_log		= 1
-slow_query_log_file	= /var/log/mysql/mysql-slow.log
-long_query_time = 0
-```
 
 ディスクイメージをメモリー上にバッファする
 
