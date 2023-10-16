@@ -1,6 +1,2 @@
-2023/08/29 15:26:19 [notice] 5058#5058: using inherited sockets from "6;7;"
-2023/10/15 13:53:32 [notice] 21476#21476: signal process started
-2023/10/15 14:46:14 [notice] 34802#34802: signal process started
-2023/10/15 14:49:49 [notice] 35027#35027: signal process started
-2023/10/15 14:50:00 [notice] 36035#36035: signal process started
-2023/10/15 14:50:33 [notice] 36377#36377: signal process started
+2023/10/16 17:59:02 [notice] 1793#1793: signal process started
+2023/10/16 18:02:16 [crit] 613#613: *2014 SSL_do_handshake() failed (SSL: error:0A00006C:SSL routines::bad key share) while SSL handshaking, client: 165.154.49.137, server: 0.0.0.0:443
