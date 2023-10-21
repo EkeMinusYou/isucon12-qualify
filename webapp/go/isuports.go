@@ -428,6 +428,19 @@ func retrieveCompetition(ctx context.Context, tenantDB dbOrTx, id string) (*Comp
 	return &c, nil
 }
 
+// 複数の退会を取得する
+func retrieveCompetitions(ctx context.Context, tenantDB dbOrTx, ids []string) (*[]CompetitionRow, error) {
+	var cs []CompetitionRow
+	sql, args, err := sqlx.In("SELECT * FROM competition WHERE id IN (?)", ids)
+	if err != nil {
+		return nil, fmt.Errorf("error Select competition: ids=%s, %w", ids, err)
+	}
+	if err := tenantDB.SelectContext(ctx, &cs, sql, args...); err != nil {
+		return nil, fmt.Errorf("error Select competition: ids=%s, %w", ids, err)
+	}
+	return &cs, nil
+}
+
 type PlayerScoreRow struct {
 	TenantID      int64  `db:"tenant_id"`
 	ID            string `db:"id"`
@@ -1277,15 +1290,24 @@ func playerHandler(c echo.Context) error {
 	}
 
 	psds := make([]PlayerScoreDetail, 0, len(pss))
+
+	competitionIds := make([]string, 0, len(pss))
 	for _, ps := range pss {
-		comp, err := retrieveCompetition(ctx, tenantDB, ps.CompetitionID)
-		if err != nil {
-			return fmt.Errorf("error retrieveCompetition: %w", err)
+		competitionIds = append(competitionIds, ps.CompetitionID)
+	}
+	competitions, err := retrieveCompetitions(ctx, tenantDB, competitionIds)
+	if err != nil {
+		return fmt.Errorf("error retrieveCompetitions: %w", err)
+	}
+	for _, ps := range pss {
+		for _, comp := range *competitions {
+			if ps.CompetitionID == comp.ID {
+				psds = append(psds, PlayerScoreDetail{
+					CompetitionTitle: comp.Title,
+					Score:            ps.Score,
+				})
+			}
 		}
-		psds = append(psds, PlayerScoreDetail{
-			CompetitionTitle: comp.Title,
-			Score:            ps.Score,
-		})
 	}
 
 	res := SuccessResult{
