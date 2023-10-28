@@ -1343,6 +1343,10 @@ type PlayerScoreRowWithPlayerRow struct {
 	PlayerRow      *PlayerRow      `db:"p"`
 }
 
+type ID struct {
+	ID int64 `db:"id"`
+}
+
 // 参加者向けAPI
 // GET /api/player/competition/:competition_id/ranking
 // 大会ごとのランキングを取得する
@@ -1381,8 +1385,9 @@ func competitionRankingHandler(c echo.Context) error {
 	}
 
 	now := time.Now().Unix()
-	var tenant TenantRow
-	if err := adminDB.GetContext(ctx, &tenant, "SELECT * FROM tenant WHERE id = ?", v.tenantID); err != nil {
+
+	var tenant ID
+	if err := adminDB.GetContext(ctx, &tenant, "SELECT id FROM tenant WHERE id = ?", v.tenantID); err != nil {
 		return fmt.Errorf("error Select tenant: id=%d, %w", v.tenantID, err)
 	}
 
