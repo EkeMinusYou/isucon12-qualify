@@ -1152,10 +1152,20 @@ func competitionScoreHandler(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, SuccessResult{
+	err = c.JSON(http.StatusOK, SuccessResult{
 		Status: true,
 		Data:   ScoreHandlerResult{Rows: int64(len(playerScoreRows))},
 	})
+	if err != nil {
+		return fmt.Errorf("error c.JSON: %w", err)
+	}
+
+	err = RefreshRanking(ctx, tenantDB, v.tenantID, competitionID)
+	if err != nil {
+		return fmt.Errorf("error RefreshRanking: %w", err)
+	}
+
+	return nil
 }
 
 type BillingHandlerResult struct {
@@ -1410,35 +1420,9 @@ func competitionRankingHandler(c echo.Context) error {
 		}
 	}
 
-	// player_scoreを読んでいるときに更新が走ると不整合が起こるのでロックを取得する
-	fl, err := flockByTenantID(v.tenantID)
-	if err != nil {
-		return fmt.Errorf("error flockByTenantID: %w", err)
-	}
-	defer fl.Close()
-	pss := []PlayerScoreRowWithPlayerRow{}
-	if err := tenantDB.SelectContext(
-		ctx,
-		&pss,
-		`SELECT
-      ps.id AS "ps.id",
-      ps.tenant_id AS "ps.tenant_id",
-      ps.player_id AS "ps.player_id",
-      ps.competition_id AS "ps.competition_id",
-      ps.score AS "ps.score",
-      ps.row_num AS "ps.row_num",
-      ps.created_at AS "ps.created_at",
-      ps.updated_at AS "ps.updated_at",
-      p.id AS "p.id",
-      p.tenant_id AS "p.tenant_id",
-      p.display_name AS "p.display_name",
-      p.is_disqualified AS "p.is_disqualified",
-      p.created_at AS "p.created_at"
-    FROM player_score ps INNER JOIN player p ON ps.player_id = p.id WHERE ps.tenant_id = ? AND ps.competition_id = ? ORDER BY ps.row_num DESC`,
-		tenant.ID,
-		competitionID,
-	); err != nil {
-		return fmt.Errorf("error Select player_score: tenantID=%d, competitionID=%s, %w", tenant.ID, competitionID, err)
+	pss, ok := RankingCache.Get(v.tenantID, competitionID)
+	if !ok {
+		pss = []PlayerScoreRowWithPlayerRow{}
 	}
 	ranks := make([]CompetitionRank, 0, len(pss))
 	scoredPlayerSet := make(map[string]struct{}, len(pss))
