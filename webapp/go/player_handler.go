@@ -70,23 +70,10 @@ func playerHandler(c echo.Context) error {
 	}
 
 	baseSql := `
-WITH MaxRowNum AS (
-  SELECT player_id, competition_id, MAX(row_num) as max_row_num
-  FROM player_score
-  WHERE tenant_id = ? AND competition_id IN (?) AND player_id = ?
-  GROUP BY player_id, competition_id
-)
-SELECT
-  p.tenant_id as tenant_id,
-  p.id as id,
-  p.player_id as player_id,
-  p.competition_id as competition_id,
-  p.score as score,
-  p.row_num as row_num,
-  p.created_at as created_at,
-  p.updated_at as updated_at
-FROM player_score p
-INNER JOIN MaxRowNum m ON p.player_id = m.player_id AND p.competition_id = m.competition_id AND p.row_num = m.max_row_num
+SELECT id, tenant_id, player_id, competition_id, score, MAX(row_num) row_num, created_at, updated_at
+FROM player_score
+WHERE tenant_id = ? AND competition_id IN (?) AND player_id = ?
+GROUP BY competition_id
 `
 	sql, args, err := sqlx.In(baseSql, v.tenantID, csIds, p.ID)
 	if err != nil {
