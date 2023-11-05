@@ -21,3 +21,9 @@
 2023/11/05 11:47:00 [notice] 8052#8052: signal process started
 2023/11/05 11:48:16 [crit] 2037#2037: *31041 SSL_do_handshake() failed (SSL: error:0A00006C:SSL routines::bad key share) while SSL handshaking, client: 212.102.40.218, server: 0.0.0.0:443
 2023/11/05 12:32:32 [notice] 19502#19502: signal process started
+2023/11/05 12:41:55 [crit] 2037#2037: *55487 SSL_do_handshake() failed (SSL: error:0A00006C:SSL routines::bad key share) while SSL handshaking, client: 212.102.40.218, server: 0.0.0.0:443
+2023/11/05 13:07:22 [notice] 21782#21782: signal process started
+2023/11/05 13:07:33 [notice] 22124#22124: signal process started
+2023/11/05 13:35:26 [notice] 23104#23104: signal process started
+2023/11/05 13:41:54 [notice] 25427#25427: signal process started
+2023/11/05 13:56:54 [notice] 31189#31189: signal process started
