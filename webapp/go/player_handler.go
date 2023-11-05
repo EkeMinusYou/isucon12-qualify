@@ -31,14 +31,20 @@ func playerHandler(c echo.Context) error {
 	}
 	defer tenantDB.Close()
 
-	p, err := authorizePlayer(ctx, tenantDB, v.playerID)
-	if err != nil {
+	if _, err := authorizePlayer(ctx, tenantDB, v.playerID); err != nil {
 		return err
 	}
 
 	playerID := c.Param("player_id")
 	if playerID == "" {
 		return echo.NewHTTPError(http.StatusBadRequest, "player_id is required")
+	}
+	p, err := retrievePlayer(ctx, tenantDB, playerID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound, "player not found")
+		}
+		return fmt.Errorf("error retrievePlayer: %w", err)
 	}
 	cs := []CompetitionRow{}
 	if err := tenantDB.SelectContext(
