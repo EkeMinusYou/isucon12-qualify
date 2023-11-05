@@ -306,18 +306,18 @@ func retrievePlayer(ctx context.Context, tenantDB dbOrTx, id string) (*PlayerRow
 
 // 参加者を認可する
 // 参加者向けAPIで呼ばれる
-func authorizePlayer(ctx context.Context, tenantDB dbOrTx, id string) error {
-	player, err := retrievePlayer(ctx, tenantDB, id)
+func authorizePlayer(ctx context.Context, tenantDB dbOrTx, id string) (player *PlayerRow, err error) {
+	player, err = retrievePlayer(ctx, tenantDB, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return echo.NewHTTPError(http.StatusUnauthorized, "player not found")
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, "player not found")
 		}
-		return fmt.Errorf("error retrievePlayer from viewer: %w", err)
+		return nil, fmt.Errorf("error retrievePlayer from viewer: %w", err)
 	}
 	if player.IsDisqualified {
-		return echo.NewHTTPError(http.StatusForbidden, "player is disqualified")
+		return nil, echo.NewHTTPError(http.StatusForbidden, "player is disqualified")
 	}
-	return nil
+	return player, nil
 }
 
 type CompetitionRow struct {
@@ -1179,7 +1179,7 @@ func competitionRankingHandler(c echo.Context) error {
 	}
 	defer tenantDB.Close()
 
-	if err := authorizePlayer(ctx, tenantDB, v.playerID); err != nil {
+	if _, err := authorizePlayer(ctx, tenantDB, v.playerID); err != nil {
 		return err
 	}
 
@@ -1303,7 +1303,7 @@ func playerCompetitionsHandler(c echo.Context) error {
 	}
 	defer tenantDB.Close()
 
-	if err := authorizePlayer(ctx, tenantDB, v.playerID); err != nil {
+	if _, err := authorizePlayer(ctx, tenantDB, v.playerID); err != nil {
 		return err
 	}
 	return competitionsHandler(c, v, tenantDB)
