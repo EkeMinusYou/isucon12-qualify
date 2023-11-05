@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
 
@@ -62,24 +63,37 @@ func playerHandler(c echo.Context) error {
 	}
 	defer fl.Close()
 	pss := make([]PlayerScoreRow, 0, len(cs))
+
+	var csIds []string
 	for _, c := range cs {
-		ps := PlayerScoreRow{}
-		if err := tenantDB.GetContext(
-			ctx,
-			&ps,
-			// 最後にCSVに登場したスコアを採用する = row_numが一番大きいもの
-			"SELECT * FROM player_score WHERE tenant_id = ? AND competition_id = ? AND player_id = ? ORDER BY row_num DESC LIMIT 1",
-			v.tenantID,
-			c.ID,
-			p.ID,
-		); err != nil {
-			// 行がない = スコアが記録されてない
-			if errors.Is(err, sql.ErrNoRows) {
-				continue
-			}
-			return fmt.Errorf("error Select player_score: tenantID=%d, competitionID=%s, playerID=%s, %w", v.tenantID, c.ID, p.ID, err)
-		}
-		pss = append(pss, ps)
+		csIds = append(csIds, c.ID)
+	}
+
+	baseSql := `
+WITH MaxRowNum AS (
+  SELECT player_id, competition_id, MAX(row_num) as max_row_num
+  FROM player_score
+  WHERE tenant_id = ? AND competition_id IN (?) AND player_id = ?
+  GROUP BY player_id, competition_id
+)
+SELECT
+  p.tenant_id as tenant_id,
+  p.id as id,
+  p.player_id as player_id,
+  p.competition_id as competition_id,
+  p.score as score,
+  p.row_num as row_num,
+  p.created_at as created_at,
+  p.updated_at as updated_at
+FROM player_score p
+INNER JOIN MaxRowNum m ON p.player_id = m.player_id AND p.competition_id = m.competition_id AND p.row_num = m.max_row_num
+`
+	sql, args, err := sqlx.In(baseSql, v.tenantID, csIds, p.ID)
+	if err != nil {
+		return fmt.Errorf("error sqlx.In: %w", err)
+	}
+	if err := tenantDB.SelectContext(ctx, &pss, sql, args...); err != nil {
+		return fmt.Errorf("error Select player_score: %w", err)
 	}
 
 	psds := make([]PlayerScoreDetail, 0, len(pss))
