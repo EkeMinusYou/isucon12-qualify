@@ -16,4 +16,5 @@ Environment=ISUCON_DB_PORT=3306
 Environment=ISUCON_DB_USER=isucon
 Environment=ISUCON_DB_PASSWORD=isucon
 Environment=ISUCON_DB_NAME=isuports
+Environment=ISUCON_SQLITE_TRACE_FILE=sqltrace.log
 Restart=always
