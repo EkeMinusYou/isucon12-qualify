@@ -270,12 +270,20 @@ func parseViewer(c echo.Context) (*Viewer, error) {
 		return nil, fmt.Errorf("error jwk.DecodePEM: %w", err)
 	}
 
-	token, err := jwt.Parse(
-		[]byte(tokenStr),
-		jwt.WithKey(jwa.RS256, key),
-	)
-	if err != nil {
-		return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Errorf("error jwt.Parse: %s", err.Error()))
+	token, ok := CookieCache.Get(tokenStr)
+	if !ok {
+		token, err = jwt.Parse(
+			[]byte(tokenStr),
+			jwt.WithKey(jwa.RS256, key),
+		)
+		if err != nil {
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, fmt.Errorf("error jwt.Parse: %s", err.Error()))
+		}
+		CookieCache.Set(tokenStr, token)
+	} else {
+		if token.Expiration().Before(time.Now()) {
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, "token is expired")
+		}
 	}
 	if token.Subject() == "" {
 		return nil, echo.NewHTTPError(
