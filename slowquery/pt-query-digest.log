@@ -1,39 +1,39 @@
 
-# 4.7s user time, 40ms system time, 34.56M rss, 389.99G vsz
-# Current date: Mon Nov  6 02:51:12 2023
+# 4.8s user time, 60ms system time, 34.70M rss, 389.87G vsz
+# Current date: Mon Nov  6 21:33:46 2023
 # Hostname: YusukenoMac-mini.local
 # Files: slowquery/log/mysql-slow.log
-# Overall: 132.61k total, 15 unique, 1.72k QPS, 0.72x concurrency ________
-# Time range: 2023-11-05T17:49:43 to 2023-11-05T17:51:00
+# Overall: 134.17k total, 15 unique, 1.70k QPS, 0.65x concurrency ________
+# Time range: 2023-11-06T12:31:50 to 2023-11-06T12:33:09
 # Attribute          total     min     max     avg     95%  stddev  median
 # ============     ======= ======= ======= ======= ======= ======= =======
-# Exec time            55s     1us      3s   418us     1ms     9ms    52us
-# Lock time          745ms       0     6ms     5us     1us    63us       0
-# Rows sent          1.24M       0   4.88k    9.78   27.38  144.89       0
-# Rows examine      22.70M       0   3.08M  179.52  400.73   8.81k       0
-# Query size         5.55M      27     172   43.86  136.99   29.01   31.70
+# Exec time            52s     1us      4s   384us     1ms    11ms    54us
+# Lock time          770ms       0     8ms     5us     1us    80us       0
+# Rows sent          1.15M       0   4.88k    8.98   26.08  133.64       0
+# Rows examine      21.26M       0   3.08M  166.18  400.73   8.72k       0
+# Query size         5.64M      27     164   44.07  136.99   29.35   31.70
 
 # Profile
 # Rank Query ID                            Response time Calls R/Call V/M 
 # ==== =================================== ============= ===== ====== ====
-#    1 0x676347F321DB8BC7FCB05D4948FC2248  36.4281 65.7%  7765 0.0047  0.08 SELECT visit_history
-#    2 0x94A9E43DFAAFA029A1FC19A5563AD0F5  10.1409 18.3% 24461 0.0004  0.00 REPLACE id_generator
-#    3 0xDA556F9115773A1A99AA0165670CE848   3.3481  6.0% 43762 0.0001  0.00 ADMIN PREPARE
-#    4 0x3289E87E94D5A82E348974B3D332E575   2.7380  4.9%     1 2.7380  0.00 DELETE visit_history
-#    5 0x2E69352DE16B15042A1217500A0400FE   1.1434  2.1%  2681 0.0004  0.00 INSERT visit_history
-# MISC 0xMISC                               1.6853  3.0% 53940 0.0000   0.0 <10 ITEMS>
+#    1 0x676347F321DB8BC7FCB05D4948FC2248  31.5754 61.1%  7796 0.0041  0.07 SELECT visit_history
+#    2 0x94A9E43DFAAFA029A1FC19A5563AD0F5   9.6075 18.6% 23038 0.0004  0.00 REPLACE id_generator
+#    3 0x3289E87E94D5A82E348974B3D332E575   3.9438  7.6%     1 3.9438  0.00 DELETE visit_history
+#    4 0xDA556F9115773A1A99AA0165670CE848   3.4723  6.7% 44259 0.0001  0.00 ADMIN PREPARE
+#    5 0x57AC6CF9E75AF6673635BEFFE5F2117E   1.3683  2.6%  7313 0.0002  0.00 SELECT tenant
+# MISC 0xMISC                               1.6714  3.2% 51766 0.0000   0.0 <10 ITEMS>
 
-# Query 1: 115.90 QPS, 0.54x concurrency, ID 0x676347F321DB8BC7FCB05D4948FC2248 at byte 6541404
-# Scores: V/M = 0.08
-# Time range: 2023-11-05T17:49:47 to 2023-11-05T17:50:54
+# Query 1: 109.80 QPS, 0.44x concurrency, ID 0x676347F321DB8BC7FCB05D4948FC2248 at byte 17788562
+# Scores: V/M = 0.07
+# Time range: 2023-11-06T12:31:58 to 2023-11-06T12:33:09
 # Attribute    pct   total     min     max     avg     95%  stddev  median
 # ============ === ======= ======= ======= ======= ======= ======= =======
-# Count          5    7765
-# Exec time     65     36s   117us   314ms     5ms     8ms    19ms     2ms
-# Lock time      1    12ms       0   229us     1us     1us     5us     1us
-# Rows sent     99   1.23M       0   4.88k  165.49  183.58  578.03   76.28
-# Rows examine  86  19.62M       0  78.96k   2.59k   2.89k   9.09k   1.26k
-# Query size    19   1.06M     141     144  142.91  136.99    0.60  136.99
+# Count          5    7796
+# Exec time     61     32s   121us   308ms     4ms     7ms    16ms     2ms
+# Lock time      1    14ms       0     1ms     1us     1us    15us     1us
+# Rows sent     98   1.14M       0   4.88k  152.76  183.58  535.33   72.65
+# Rows examine  85  18.17M       0  78.96k   2.39k   2.89k   8.42k   1.14k
+# Query size    18   1.06M     141     144  142.92  136.99    0.60  136.99
 # String:
 # Databases    isuports
 # Hosts        localhost
@@ -41,9 +41,9 @@
 # Query_time distribution
 #   1us
 #  10us
-# 100us  ##########################
+# 100us  ##############################
 #   1ms  ################################################################
-#  10ms  ##
+#  10ms  #
 # 100ms  #
 #    1s
 #  10s+
@@ -51,26 +51,26 @@
 #    SHOW TABLE STATUS FROM `isuports` LIKE 'visit_history'\G
 #    SHOW CREATE TABLE `isuports`.`visit_history`\G
 # EXPLAIN /*!50100 PARTITIONS*/
-SELECT player_id, MIN(created_at) AS min_created_at FROM visit_history WHERE tenant_id = 1 AND competition_id = '6396ba682' GROUP BY player_id\G
+SELECT player_id, MIN(created_at) AS min_created_at FROM visit_history WHERE tenant_id = 1 AND competition_id = '34433d77a' GROUP BY player_id\G
 
-# Query 2: 376.32 QPS, 0.16x concurrency, ID 0x94A9E43DFAAFA029A1FC19A5563AD0F5 at byte 27182138
+# Query 2: 349.06 QPS, 0.15x concurrency, ID 0x94A9E43DFAAFA029A1FC19A5563AD0F5 at byte 12691758
 # Scores: V/M = 0.00
-# Time range: 2023-11-05T17:49:47 to 2023-11-05T17:50:52
+# Time range: 2023-11-06T12:31:58 to 2023-11-06T12:33:04
 # Attribute    pct   total     min     max     avg     95%  stddev  median
 # ============ === ======= ======= ======= ======= ======= ======= =======
-# Count         18   24461
-# Exec time     18     10s    83us    19ms   414us     1ms   621us   247us
-# Lock time     95   712ms       0     6ms    29us   152us   145us     1us
+# Count         17   23038
+# Exec time     18     10s   103us    19ms   417us     1ms   681us   236us
+# Lock time     95   734ms       0     8ms    31us   119us   193us     1us
 # Rows sent      0       0       0       0       0       0       0       0
 # Rows examine   0       0       0       0       0       0       0       0
-# Query size    18   1.05M      45      45      45      45       0      45
+# Query size    17 1012.41k      45      45      45      45       0      45
 # String:
 # Databases    isuports
 # Hosts        localhost
 # Users        isucon
 # Query_time distribution
 #   1us
-#  10us  #
+#  10us
 # 100us  ################################################################
 #   1ms  ####
 #  10ms  #
@@ -82,42 +82,16 @@ SELECT player_id, MIN(created_at) AS min_created_at FROM visit_history WHERE ten
 #    SHOW CREATE TABLE `isuports`.`id_generator`\G
 REPLACE INTO id_generator (stub) VALUES ('a')\G
 
-# Query 3: 599.48 QPS, 0.05x concurrency, ID 0xDA556F9115773A1A99AA0165670CE848 at byte 9821668
+# Query 3: 0 QPS, 0x concurrency, ID 0x3289E87E94D5A82E348974B3D332E575 at byte 663
 # Scores: V/M = 0.00
-# Time range: 2023-11-05T17:49:47 to 2023-11-05T17:51:00
-# Attribute    pct   total     min     max     avg     95%  stddev  median
-# ============ === ======= ======= ======= ======= ======= ======= =======
-# Count         33   43762
-# Exec time      6      3s    16us    11ms    76us   159us   153us    52us
-# Lock time      0       0       0       0       0       0       0       0
-# Rows sent      0       0       0       0       0       0       0       0
-# Rows examine   0       0       0       0       0       0       0       0
-# Query size    22   1.25M      30      30      30      30       0      30
-# String:
-# Databases    isuports
-# Hosts        localhost
-# Users        isucon
-# Query_time distribution
-#   1us
-#  10us  ################################################################
-# 100us  #######
-#   1ms  #
-#  10ms  #
-# 100ms
-#    1s
-#  10s+
-administrator command: Prepare\G
-
-# Query 4: 0 QPS, 0x concurrency, ID 0x3289E87E94D5A82E348974B3D332E575 at byte 662
-# Scores: V/M = 0.00
-# Time range: all events occurred at 2023-11-05T17:49:46
+# Time range: all events occurred at 2023-11-06T12:31:54
 # Attribute    pct   total     min     max     avg     95%  stddev  median
 # ============ === ======= ======= ======= ======= ======= ======= =======
 # Count          0       1
-# Exec time      4      3s      3s      3s      3s      3s       0      3s
-# Lock time      0     4us     4us     4us     4us     4us       0     4us
+# Exec time      7      4s      4s      4s      4s      4s       0      4s
+# Lock time      0     6us     6us     6us     6us     6us       0     6us
 # Rows sent      0       0       0       0       0       0       0       0
-# Rows examine  13   3.08M   3.08M   3.08M   3.08M   3.08M       0   3.08M
+# Rows examine  14   3.08M   3.08M   3.08M   3.08M   3.08M       0   3.08M
 # Query size     0      58      58      58      58      58       0      58
 # String:
 # Databases    isuports
@@ -140,31 +114,58 @@ DELETE FROM visit_history WHERE created_at >= '1654041600'\G
 # EXPLAIN /*!50100 PARTITIONS*/
 select * from  visit_history WHERE created_at >= '1654041600'\G
 
-# Query 5: 37.76 QPS, 0.02x concurrency, ID 0x2E69352DE16B15042A1217500A0400FE at byte 30472725
+# Query 4: 623.37 QPS, 0.05x concurrency, ID 0xDA556F9115773A1A99AA0165670CE848 at byte 26199385
 # Scores: V/M = 0.00
-# Time range: 2023-11-05T17:49:49 to 2023-11-05T17:51:00
+# Time range: 2023-11-06T12:31:58 to 2023-11-06T12:33:09
 # Attribute    pct   total     min     max     avg     95%  stddev  median
 # ============ === ======= ======= ======= ======= ======= ======= =======
-# Count          2    2681
-# Exec time      2      1s    93us    12ms   426us     1ms   660us   176us
-# Lock time      0     6ms       0     1ms     2us     1us    27us     1us
+# Count         32   44259
+# Exec time      6      3s    17us    13ms    78us   152us   152us    54us
+# Lock time      0       0       0       0       0       0       0       0
 # Rows sent      0       0       0       0       0       0       0       0
 # Rows examine   0       0       0       0       0       0       0       0
-# Query size     6 389.69k     147     150  148.84  143.84       0  143.84
+# Query size    22   1.27M      30      30      30      30       0      30
 # String:
 # Databases    isuports
 # Hosts        localhost
 # Users        isucon
 # Query_time distribution
 #   1us
-#  10us  #
-# 100us  ################################################################
-#   1ms  ######
+#  10us  ################################################################
+# 100us  #######
+#   1ms  #
 #  10ms  #
 # 100ms
 #    1s
 #  10s+
+administrator command: Prepare\G
+
+# Query 5: 110.80 QPS, 0.02x concurrency, ID 0x57AC6CF9E75AF6673635BEFFE5F2117E at byte 25586433
+# Scores: V/M = 0.00
+# Time range: 2023-11-06T12:31:58 to 2023-11-06T12:33:04
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          5    7313
+# Exec time      2      1s    39us     7ms   187us   690us   322us    84us
+# Lock time      1    12ms       0   411us     1us     1us     5us     1us
+# Rows sent      0   7.14k       0       1    1.00    0.99    0.01    0.99
+# Rows examine   0   7.14k       0       1    1.00    0.99    0.01    0.99
+# Query size     6 365.30k      42      56   51.15   54.21    5.02   54.21
+# String:
+# Databases    isuports
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us  ################################################################
+# 100us  ############################
+#   1ms  ##
+#  10ms
+# 100ms
+#    1s
+#  10s+
 # Tables
-#    SHOW TABLE STATUS FROM `isuports` LIKE 'visit_history'\G
-#    SHOW CREATE TABLE `isuports`.`visit_history`\G
-INSERT INTO visit_history (player_id, tenant_id, competition_id, created_at, updated_at) VALUES ('9fa53a50', 835, '9fa5779e', 1699206650, 1699206650)\G
+#    SHOW TABLE STATUS FROM `isuports` LIKE 'tenant'\G
+#    SHOW CREATE TABLE `isuports`.`tenant`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM tenant WHERE name = 'ene-k-1699273946'\G
