@@ -17,3 +17,7 @@
 2023/11/06 17:10:31 [notice] 9970#9970: signal process started
 2023/11/06 17:13:12 [notice] 10976#10976: signal process started
 2023/11/06 17:18:32 [notice] 12328#12328: signal process started
+2023/11/06 17:30:35 [notice] 13929#13929: signal process started
+2023/11/06 17:30:42 [error] 569#569: *195331 connect() to unix:/tmp/webapp.sock failed (111: Unknown error) while connecting to upstream, client: 172.31.44.98, server: *.t.isucon.dev, request: "POST /initialize HTTP/2.0", upstream: "http://unix:/tmp/webapp.sock:/initialize", host: "admin.t.isucon.local"
+2023/11/06 17:30:44 [error] 569#569: *195333 connect() to unix:/tmp/webapp.sock failed (111: Unknown error) while connecting to upstream, client: 172.31.44.98, server: *.t.isucon.dev, request: "POST /initialize HTTP/2.0", upstream: "http://unix:/tmp/webapp.sock:/initialize", host: "admin.t.isucon.local"
+2023/11/06 17:31:16 [notice] 14790#14790: signal process started
