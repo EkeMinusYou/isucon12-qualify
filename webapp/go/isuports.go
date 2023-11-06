@@ -17,6 +17,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -25,6 +26,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -639,12 +641,25 @@ func tenantsBillingHandler(c echo.Context) error {
 			); err != nil {
 				return fmt.Errorf("failed to Select competition: %w", err)
 			}
+
+			eg, egCtx := errgroup.WithContext(context.TODO())
+			mutex := sync.Mutex{}
 			for _, comp := range cs {
-				report, err := billingReportByCompetition(ctx, tenantDB, &comp)
-				if err != nil {
-					return fmt.Errorf("failed to billingReportByCompetition: %w", err)
-				}
-				tb.BillingYen += report.BillingYen
+				comp := comp
+				eg.Go(func() error {
+					report, err := billingReportByCompetition(ctx, tenantDB, &comp)
+					if err != nil {
+						egCtx.Done()
+						return fmt.Errorf("failed to billingReportByCompetition: %w", err)
+					}
+					mutex.Lock()
+					tb.BillingYen += report.BillingYen
+					mutex.Unlock()
+					return nil
+				})
+			}
+			if err := eg.Wait(); err != nil {
+				return err
 			}
 			tenantBillings = append(tenantBillings, tb)
 			return nil
