@@ -26,7 +26,11 @@ func addIndexToDB(dbPath string, indexSQL string) {
 
 func main() {
 	tenantDBDir := "../../initial_data"
-	indexSQL := "CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_comp_player ON player_score(tenant_id, competition_id, player_id);"
+	sqls := []string{
+		"CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_comp_row ON player_score(tenant_id, competition_id, row_num);",
+		"CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_comp_player ON player_score(tenant_id, competition_id, player_id);",
+		"CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_comp ON player_score(tenant_id, competition_id);",
+	}
 
 	err := filepath.Walk(tenantDBDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -34,8 +38,10 @@ func main() {
 		}
 
 		if strings.HasSuffix(path, ".db") {
-			addIndexToDB(path, indexSQL)
-			fmt.Printf("Added index to %s\n", path)
+			for _, indexSQL := range sqls {
+				addIndexToDB(path, indexSQL)
+				fmt.Printf("Added index to %s\n", path)
+			}
 		}
 
 		return nil
