@@ -35,6 +35,8 @@ CREATE INDEX IF NOT EXISTS idx_competition_on_tenant ON competition(tenant_id, c
 
 CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_comp_player ON player_score(tenant_id, competition_id, player_id);
 
+CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_player_comp ON player_score(tenant_id, player_id, competition_id);
+
 CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_comp_row ON player_score(tenant_id, competition_id, row_num);
 
 CREATE INDEX IF NOT EXISTS idx_player_score_on_tenant_comp ON player_score(tenant_id, competition_id);

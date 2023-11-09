@@ -58,18 +58,13 @@ func playerHandler(c echo.Context) error {
 
 	pss := make([]PlayerScoreRow, 0, len(cs))
 
-	var csIds []string
-	for _, c := range cs {
-		csIds = append(csIds, c.ID)
-	}
-
 	baseSql := `
 SELECT id, tenant_id, player_id, competition_id, score, MAX(row_num) row_num, created_at, updated_at
 FROM player_score
-WHERE tenant_id = ? AND competition_id IN (?) AND player_id = ?
+WHERE tenant_id = ? AND player_id = ?
 GROUP BY competition_id
 `
-	sql, args, err := sqlx.In(baseSql, v.tenantID, csIds, p.ID)
+	sql, args, err := sqlx.In(baseSql, v.tenantID, p.ID)
 	if err != nil {
 		return fmt.Errorf("error sqlx.In: %w", err)
 	}
