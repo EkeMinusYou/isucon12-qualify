@@ -1,0 +1,114 @@
+
+# 2.8s user time, 40ms system time, 34.44M rss, 389.86G vsz
+# Current date: Tue Nov  7 02:49:49 2023
+# Hostname: YusukenoMac-mini.local
+# Files: slowquery/log/mysql-slow.log
+# Overall: 69.80k total, 12 unique, 1.01k QPS, 2.22x concurrency _________
+# Time range: 2023-11-06T17:47:29 to 2023-11-06T17:48:38
+# Attribute          total     min     max     avg     95%  stddev  median
+# ============     ======= ======= ======= ======= ======= ======= =======
+# Exec time           153s     1us      3s     2ms     5ms    29ms   108us
+# Lock time          116ms       0     6ms     1us     1us    25us     1us
+# Rows sent          1.67M       0   4.83k   25.06   92.72  238.61    0.99
+# Rows examine      28.74M       0   3.08M  431.78   1.46k  12.32k    0.99
+# Query size         5.04M      27     170   75.77  143.84   43.08   51.63
+
+# Profile
+# Rank Query ID                            Response time  Calls R/Call V/M
+# ==== =================================== ============== ===== ====== ===
+#    1 0x676347F321DB8BC7FCB05D4948FC2248  137.8828 90.0% 10970 0.0126  0.35 SELECT visit_history
+#    2 0x57AC6CF9E75AF6673635BEFFE5F2117E    5.8205  3.8% 34674 0.0002  0.00 SELECT tenant
+#    3 0x2E69352DE16B15042A1217500A0400FE    4.6039  3.0%  9970 0.0005  0.01 INSERT visit_history
+# MISC 0xMISC                                4.8606  3.2% 14189 0.0003   0.0 <9 ITEMS>
+
+# Query 1: 171.41 QPS, 2.15x concurrency, ID 0x676347F321DB8BC7FCB05D4948FC2248 at byte 538140
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.35
+# Time range: 2023-11-06T17:47:34 to 2023-11-06T17:48:38
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         15   10970
+# Exec time     90    138s   134us      1s    13ms    21ms    66ms     2ms
+# Lock time     19    22ms       0     2ms     2us     1us    25us     1us
+# Rows sent     96   1.62M       0   4.83k  154.56  166.51  585.89   56.92
+# Rows examine  89  25.62M       0  77.75k   2.39k   2.62k   9.20k  874.75
+# Query size    29   1.49M     137     144  142.29  136.99    0.55  136.99
+# String:
+# Databases    isuports
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us
+# 100us  ########################################
+#   1ms  ################################################################
+#  10ms  ##################
+# 100ms  ##
+#    1s  #
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuports` LIKE 'visit_history'\G
+#    SHOW CREATE TABLE `isuports`.`visit_history`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT player_id, MIN(created_at) AS min_created_at FROM visit_history WHERE tenant_id = 1 AND competition_id = '5d5e808a3' GROUP BY player_id\G
+
+# Query 2: 541.78 QPS, 0.09x concurrency, ID 0x57AC6CF9E75AF6673635BEFFE5F2117E at byte 11309068
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2023-11-06T17:47:34 to 2023-11-06T17:48:38
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         49   34674
+# Exec time      3      6s    51us    78ms   167us   287us   608us   103us
+# Lock time     48    56ms       0     2ms     1us     1us    14us     1us
+# Rows sent      1  33.86k       0       1    1.00    0.99    0.01    0.99
+# Rows examine   0  33.86k       0       1    1.00    0.99    0.01    0.99
+# Query size    34   1.73M      42      58   52.39   56.92    4.02   51.63
+# String:
+# Databases    isuports
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us  ##########################
+# 100us  ################################################################
+#   1ms  #
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuports` LIKE 'tenant'\G
+#    SHOW CREATE TABLE `isuports`.`tenant`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM tenant WHERE name = 'rpplx-rkop-1699292863'\G
+
+# Query 3: 155.78 QPS, 0.07x concurrency, ID 0x2E69352DE16B15042A1217500A0400FE at byte 18710472
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.01
+# Time range: 2023-11-06T17:47:34 to 2023-11-06T17:48:38
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         14    9970
+# Exec time      3      5s    81us   107ms   461us     2ms     2ms   159us
+# Lock time     19    23ms       0     6ms     2us     1us    56us     1us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size    26   1.36M     138     150  143.18  143.84    3.39  136.99
+# String:
+# Databases    isuports
+# Hosts        localhost
+# Users        isucon
+# Query_time distribution
+#   1us
+#  10us  #
+# 100us  ################################################################
+#   1ms  #####
+#  10ms  #
+# 100ms  #
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuports` LIKE 'visit_history'\G
+#    SHOW CREATE TABLE `isuports`.`visit_history`\G
+INSERT INTO visit_history (player_id, tenant_id, competition_id, created_at, updated_at) VALUES ('2136', 18, '92232', 1699292915, 1699292915)\G
