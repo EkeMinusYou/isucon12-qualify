@@ -46,17 +46,20 @@ func playerHandler(c echo.Context) error {
 		}
 		return fmt.Errorf("error retrievePlayer: %w", err)
 	}
-	cs := []CompetitionRow{}
-	if err := tenantDB.SelectContext(
-		ctx,
-		&cs,
-		"SELECT * FROM competition WHERE tenant_id = ? ORDER BY created_at ASC",
-		v.tenantID,
-	); err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return fmt.Errorf("error Select competition: %w", err)
-	}
 
-	pss := make([]PlayerScoreRow, 0, len(cs))
+	cs := []CompetitionRow{}
+	done := make(chan error, 1)
+	go func() {
+		err := tenantDB.SelectContext(
+			ctx,
+			&cs,
+			"SELECT * FROM competition WHERE tenant_id = ? ORDER BY created_at ASC",
+			v.tenantID,
+		)
+		done <- err
+	}()
+
+	var pss []PlayerScoreRow
 
 	baseSql := `
 SELECT id, tenant_id, player_id, competition_id, score, MAX(row_num) row_num, created_at, updated_at
@@ -74,9 +77,10 @@ GROUP BY competition_id
 
 	psds := make([]PlayerScoreDetail, 0, len(pss))
 
-	if err != nil {
+	if err := <-done; err != nil {
 		return fmt.Errorf("error retrieveCompetitions: %w", err)
 	}
+
 	for _, ps := range pss {
 		for _, comp := range cs {
 			if ps.CompetitionID == comp.ID {
