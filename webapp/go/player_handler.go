@@ -79,16 +79,11 @@ GROUP BY competition_id
 
 	psds := make([]PlayerScoreDetail, 0, len(pss))
 
-	competitionIds := make([]string, 0, len(pss))
-	for _, ps := range pss {
-		competitionIds = append(competitionIds, ps.CompetitionID)
-	}
-	competitions, err := retrieveCompetitions(ctx, tenantDB, competitionIds)
 	if err != nil {
 		return fmt.Errorf("error retrieveCompetitions: %w", err)
 	}
 	for _, ps := range pss {
-		for _, comp := range *competitions {
+		for _, comp := range cs {
 			if ps.CompetitionID == comp.ID {
 				psds = append(psds, PlayerScoreDetail{
 					CompetitionTitle: comp.Title,
