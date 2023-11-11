@@ -168,7 +168,7 @@ func Run() {
 		e.Logger.Fatalf("failed to connect db: %v", err)
 		return
 	}
-	adminDB.SetMaxOpenConns(10)
+	adminDB.SetMaxOpenConns(50)
 	defer adminDB.Close()
 
 	socketFile := "/tmp/webapp.sock"
