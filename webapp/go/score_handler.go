@@ -73,12 +73,6 @@ func competitionScoreHandler(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid CSV headers")
 	}
 
-	// / DELETEしたタイミングで参照が来ると空っぽのランキングになるのでロックする
-	fl, err := flockByTenantID(v.tenantID)
-	if err != nil {
-		return fmt.Errorf("error flockByTenantID: %w", err)
-	}
-	defer fl.Close()
 	var rowNum int64
 	playerScoreRows := []PlayerScoreRow{}
 	for {
@@ -128,7 +122,12 @@ func competitionScoreHandler(c echo.Context) error {
 		})
 	}
 
-	if _, err := tenantDB.ExecContext(
+	tx, err := tenantDB.Beginx()
+	if err != nil {
+		return fmt.Errorf("error tenantDB.Beginx: %w", err)
+	}
+
+	if _, err := tx.ExecContext(
 		ctx,
 		"DELETE FROM player_score WHERE tenant_id = ? AND competition_id = ?",
 		v.tenantID,
@@ -137,13 +136,18 @@ func competitionScoreHandler(c echo.Context) error {
 		return fmt.Errorf("error Delete player_score: tenantID=%d, competitionID=%s, %w", v.tenantID, competitionID, err)
 	}
 
-	_, err = tenantDB.NamedExecContext(
+	_, err = tx.NamedExecContext(
 		ctx,
 		"INSERT INTO player_score (id, tenant_id, player_id, competition_id, score, row_num, created_at, updated_at) VALUES (:id, :tenant_id, :player_id, :competition_id, :score, :row_num, :created_at, :updated_at)",
 		playerScoreRows,
 	)
 	if err != nil {
 		return fmt.Errorf("error NamedExecContext: %w", err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("error tx.Commit: %w", err)
 	}
 
 	err = c.JSON(http.StatusOK, SuccessResult{
