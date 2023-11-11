@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -171,27 +170,10 @@ func Run() {
 	adminDB.SetMaxOpenConns(50)
 	defer adminDB.Close()
 
-	socketFile := "/tmp/webapp.sock"
-	if _, err := os.Stat(socketFile); err == nil {
-		os.Remove(socketFile)
-	}
-
-	listener, err := net.Listen("unix", socketFile)
-	if err != nil {
-		e.Logger.Fatalf("failed to listen: %v", err)
-		return
-	}
-	err = os.Chmod(socketFile, 0777)
-	if err != nil {
-		e.Logger.Fatalf("failed to chmod: %v", err)
-		return
-	}
-	e.Listener = listener
-
-	server := new(http.Server)
-	if err := e.StartServer(server); err != nil {
-		e.Logger.Fatalf("failed to serve: %v", err)
-	}
+	port := getEnv("SERVER_APP_PORT", "3000")
+	e.Logger.Infof("starting isuports server on : %s ...", port)
+	serverPort := fmt.Sprintf(":%s", port)
+	e.Logger.Fatal(e.Start(serverPort))
 }
 
 // エラー処理関数
