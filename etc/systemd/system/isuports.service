@@ -11,7 +11,7 @@ User=isucon
 Group=isucon
 WorkingDirectory=/home/isucon/webapp/go
 ExecStart=/home/isucon/webapp/go/isuports -cpuprofile cpu.pprof
-Environment=ISUCON_DB_HOST=127.0.0.1
+Environment=ISUCON_DB_HOST=172.31.30.228
 Environment=ISUCON_DB_PORT=3306
 Environment=ISUCON_DB_USER=isucon
 Environment=ISUCON_DB_PASSWORD=isucon
